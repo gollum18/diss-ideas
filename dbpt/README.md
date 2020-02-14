@@ -174,8 +174,9 @@ reaches a certain implementation-dependent size.
 
 ## Proposed Solution
 The solution proposed by this research involves organizing a P2P network into a 
-series of overlay networks similar to DNS. This solution will organize each overlay
-network into a single distributed B+ tree.
+series of overlay networks similar to DNS that is built ontop of the dynamic B+
+tree algorithm. This enables incredible scaling while minimizing so-called
+overlay levels.
 
 ## Anticipated Challenges
 I have identified the following challenges with the proposed solution:
@@ -184,12 +185,55 @@ I have identified the following challenges with the proposed solution:
 3. Guaranteeing the network stays responsive when a peer or group of peers becomes
 malicious.
 
-### Operational Algorithms
+### Terminology
 
-#### Hashing
+Autonomous System (AS): An autonomous system is a collection of disparate nodes
+organized into a closed system. The AS is able to automatically respond to feedback
+both from within and without the system. The most common autonomous systems can
+be found within the modern Internet infrastructure.
 
-#### Searching
+B+ Tree: A dynamic data structure often used to minimize searching and disk access
+within relational database systems. B+ trees possess the ability to automatically
+expand and contract as keys (and potential associated values) are addedd to the 
+tree.
 
-#### Insertion
+Blockchain: A relatively recent technology better known as a distributed ledger.
+A blockchain is literally a distributed read-only time-stamping server that
+underlies all major cryptocurrency systems. Recent research has shifted towards
+inter-blockchain communication (what I refer to as IBC) and improving accessibility
+and usability of smart contracts.
 
-#### Deletion
+BFT: Byzantine Fault Tolerance (BFT) is a desired property of all distributed 
+systems. BFT is a classical problem in distributed systems. It represents how
+well a distributed system is able to make accurate and correct decisions in
+the presence of potentially faulty nodes. Leslie Lamport et al. proved in their
+classical paper on the Byzantine Generals problem that for any system with *N* nodes,
+a subset *n* must exist from all nodes *N* where |*n*| must be greater than 1/3N 
+for the system to continue making honest decisions in the face of *N*-*n* faulty 
+nodes.
+
+Committee: A collection of elected nodes in a distributed system that represents
+a larger group of nodes. These nodes make collective decisions on behalf of their
+collective electorate. They are also often used to minimize communication 
+complexity amongst the nodes they represent. Committees largely exist as a 
+possible solution to Byzantine Fault Tolerance and the Byzantine Generals problem.
+
+Cryptocurrency: An alternative form of economic exchange. Cryptocurrency is purely
+digital and was designed to reduce the overhead in traditional financial markets
+by elminating the use of third-party intermediaries in financial transactions.
+The role of cryptocurrency as a bargaining chip is only a byproduct of its
+original goal. The primary goal of cryptocurrency is to serve as incentive in
+blockchain systems. Cryptocurrency is highly speculative (more so than most stocks)
+as its value is bound to the performance of the distributed ledger it is built on.
+
+DNS: The Dynamic Name Service (DNS). DNS is a classical dustributed system whose
+design serves as the basic model for the pursuits of this research. DNS is a
+fundamental service in the Internet. Without it, users would need to remember
+the IP addresses of the servers/hosts they wisg to communicate instead of a
+convenient pnemonic hostname.
+
+### General Description
+
+### Formal Proof
+
+### Architecture
