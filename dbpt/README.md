@@ -226,14 +226,82 @@ original goal. The primary goal of cryptocurrency is to serve as incentive in
 blockchain systems. Cryptocurrency is highly speculative (more so than most stocks)
 as its value is bound to the performance of the distributed ledger it is built on.
 
-DNS: The Dynamic Name Service (DNS). DNS is a classical dustributed system whose
+DNS: The Dynamic Name Service (DNS). DNS is a classical distributed system whose
 design serves as the basic model for the pursuits of this research. DNS is a
 fundamental service in the Internet. Without it, users would need to remember
-the IP addresses of the servers/hosts they wisg to communicate instead of a
+the IP addresses of the servers/hosts they wish to communicate with instead of a
 convenient pnemonic hostname.
 
-### General Description
+Round-Trip Time: The time between sending a message from a sender to
+a receiver and getting back the reply. RTT can be used as a simple
+form of load-balancing for intermediary routes. For many applications
+the classical formula for RTT: $(1 - alpha) * sample + alpha * estimate$.
+
+Routing Table: Usually associated with layer three (Network Layer) devices, a routing
+table maps IP addresses to outbound ports. In computer networking when a router 
+receives a packet, it strips off the layer three header and looks up the destination
+IP address in its routing table. The router will match the IP address with the 
+outbound I/O port corresponding to the longest matching IP prefix. How the 
+routing table is updated and maintained is outside of the scope of this table.
+Interested readers can refer __Computer Networking: A Top-Down Approach"__ by James
+Kurose and Keith Ross.
+
+### General Description and Architecture
+B+ trees are extensively used in all types of database management systems. Their 
+primary purpose is to serve as a key index to accelerate lookups. I propose 
+utilizing a modified B+ tree as the basis for a generalized architecture for
+a distributed system. The standard overflow and underflow mechanisms of B+ trees
+would play a large part in enabling greater scalability in such a system. All 
+internal nodes of the system are regarded as directory nodes. From a generic
+standpoint, directory nodes haev the sole responsibilty of routing requests through
+the network to leaf nodes. Leaf nodes act as worker nodes within the network. The
+services offered by the network are performed by leaf nodes. Essentially every 
+level of the tree that is not the leaf level serves as an overlay network and is
+intended to reduce communication complexity.
+
+Due to the B+ tree architecture of the system, certain systems (dependent on use
+case) can leverage the B+ trees internal nodes as a load balancing mechanism. For
+instance, if the service offered by the network is a replicated datastore such as
+a blockchain, then all leaf nodes hold full chain state regardless. Internal nodes
+in such a system only need to maintain state on received and observed feedback 
+regarding their immediate children. This information can be utilized to route 
+requests appropriately to automatically balance load for the system. Heuristics and
+feedback control mechanisms for these types of DBPT are part of this proposal.
+
+In such a system, new entrants would generate a key from a large domain, say N+ 
+(or some restricted domain drawn from it). The new entrant would then submit 
+their key to the network and a quick lookup would be performed to determine if 
+the key is already registered. If not, the entrant enters the network by being 
+mapped to the correct place in the B+ tree. Otherwise, a collision resolution 
+mechanism is employed to assign the entrant a unique key. This key would then be 
+used to uniquely identify a user in the network. Systems that require certain 
+leels of anonymity would require different schemas.
+
+Leaving a DBPT system is simple. It largely performs identically to leaving a 
+regular B+ tree. There are however, two distinct cases:
+
+1.) A leaf (worker) node requests to leave the network.
+2.) An internal (directory) node requests to leave the network.
+
+In the first case, the leaf node notifies its parent of its intent to leave. Here
+parent is defined as the directory node responsible for routing traffic to and from
+the leaf node. Once notified, the parent node would just remove the worker node
+from its routing table (here, I borrow terminology from networking literature).
+
+In the second case, just as with the first case, the internal node must inform
+its parent so it can update its routing table. The internal node must also 
+redistribute all of its children nodes to its previous and next siblings. 
+Note that if the internal node is the first child node of the parent, all of 
+its children are disributed to its next sibling. If the internal node is the
+last child node of the parent, then its children are distributed to its previous
+sibling.
+
+Note that when a removal, overflow, or underflow occur, the regional subtree where
+this occurs must be locked so that its state remains consistent. Doing so is 
+actually quite simple. In most cases, only the directory node needs locked in the
+request direction (travelling down the tree). Unless the directory node is being
+directly manipulated itself (i.e. it is being removed), responses should still be 
+allowed to flow back up through the tree.
 
 ### Formal Proof
-
-### Architecture
+A formal proof of the architecture presented here is forthcoming.
